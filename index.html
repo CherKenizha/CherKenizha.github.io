@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración Ultra Seguro</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .btn-danger { background: red; color: white; padding: 15px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido, Administrador</h1>
+    <p>Estado de la sesión: <b>Activa</b></p>
+    <button class="btn-danger" onclick="alert('¡Acción realizada en la cuenta!')">ELIMINAR MI CUENTA</button>
+
+    <script>
+        // Simulamos una cookie de sesión vulnerable (sin HttpOnly)
+        document.cookie = "session_token=FLAG{CLICK_JACK_AND_STEAL_2024}; path=/";
+    </script>
+</body>
+</html>
