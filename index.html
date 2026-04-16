@@ -137,7 +137,7 @@
 <body>
 
     <div class="card">
-        <h1>🔐 Panel Admin CTF</h1>
+        <h1>🔐 Panel CTF Cabeceras de seguridad</h1>
         <p>Estado: <span class="status">● Sesión Activa</span></p>
         
      
@@ -146,32 +146,15 @@
         <div id="searchResult" style="min-height: 22px; margin: 8px 0; color: #4a5568; font-size: 0.9rem;"></div>
         
       
-        <button class="btn btn-danger" id="actionBtn">⚠️ ELIMINAR MI CUENTA</button>
+        <button class="btn btn-danger" id="actionBtn"> ELIMINAR MI CUENTA</button>
                 
         <button class="btn btn-secondary" style="width:100%" onclick="simularHSTS()">🌐 Simular Ataque MITM (Sin HSTS)</button>
-
-        <div class="note">
-            🎯 <strong>Objetivo:</strong> Explota las vulnerabilidades y desbloquea los badges.<br>
-            💡 Pista: <code class="code">&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> en el buscador.
-        </div>
-
-        <!-- Progress Tracker -->
-        <div id="progress-bar">
-            <span class="badge" id="badge-cookie">🍪 Cookie</span>
-            <span class="badge" id="badge-xss">⚡ XSS/CSP</span>
-            <span class="badge" id="badge-click">🖱️ Clickjack</span>
-            <span class="badge" id="badge-mime">📁 MIME</span>
-        </div>
+      
+      
     </div>
 
    
-    <div class="hsts-overlay hidden" id="hstsModal">
-        <h2> Conexión no segura</h2>
-        <p> <strong>Sin HSTS activado:</strong> Un atacante en la misma red Wi-Fi puede interceptar tu tráfico y redirigirte de <code>https://panel.com</code> a <code>http://panel.com</code>.</p>
-        <p> El atacante ve tus credenciales en texto plano y puede inyectar scripts maliciosos.</p>
-        <p> <strong>Solución:</strong> Implementar <code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code> en el servidor.</p>
-        <button class="close" onclick="cerrarHSTS()">Entendido</button>
-    </div>
+  
 
     <script>
         
@@ -197,8 +180,8 @@
             
            
             if (Object.values(progress).every(Boolean)) {
-                console.log("🏆 ¡RETO COMPLETADO! Todas las vulnerabilidades explotadas.");
-                alert("🎉 ¡FELICIDADES! Has completado el CTF.\n\nFlag: " + document.cookie.split('=')[1]);
+                console.log(" ¡RETO COMPLETADO! Todas las vulnerabilidades explotadas.");
+                alert(" ¡FELICIDADES! Has completado el CTF.\n\nFlag: " + document.cookie.split('=')[1]);
             }
         }
 
@@ -207,7 +190,7 @@
             const flag = decryptFlag(_0xdata, _0xkey);
           
             document.cookie = `session_token=${flag}; path=/; SameSite=Lax`;
-            console.log("%c[🔐 CTF] Sesión iniciada. Flag almacenada en cookie.", "color:#e74c3c; font-weight:bold;");
+            console.log("%c[ CTF] Sesión iniciada. Flag almacenada en cookie.", "color:#e74c3c; font-weight:bold;");
             updateBadge('cookie');
         }
 
