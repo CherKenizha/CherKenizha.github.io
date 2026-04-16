@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control - Administración</title>
-  
+    <title>Panel CTF - Cabeceras de Seguridad</title>
     <style>
+        :root {
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #3498db;
+            --bg: #f4f7f6;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,148 +26,247 @@
         .card {
             background: white;
             padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
         }
-        h1 { color: #333; font-size: 1.5rem; margin-bottom: 1rem; }
-        .status { color: #27ae60; font-weight: bold; margin-bottom: 2rem; }
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-            margin: 10px 0;
-        }
-        .btn-danger:hover { background-color: #c0392b; }
-        .btn-secondary {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin: 5px;
-        }
-        .btn-secondary:hover { background-color: #2980b9; }
+        h1 { margin: 0 0 10px; font-size: 1.6rem; color: #2c3e50; }
+        .status { color: var(--success); font-weight: bold; }
         
-        .overlay-test { color: #ccc; font-size: 0.8rem; margin-top: 20px; }
-        .security-note { 
-            background: #fff3cd; 
-            padding: 10px; 
-            border-radius: 5px; 
-            margin-top: 15px;
-            font-size: 0.85rem;
-            border-left: 4px solid #ffc107;
+        /* Controles */
+        .search-box {
+            width: 100%;
+            padding: 10px 12px;
+            margin: 15px 0 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.2s;
         }
+        .search-box:focus { outline: none; border-color: var(--info); }
+        
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin: 4px;
+        }
+        .btn-search { background: var(--info); color: white; }
+        .btn-search:hover { background: #2980b9; }
+        .btn-danger { background: var(--danger); color: white; width: 100%; margin-top: 15px; }
+        .btn-danger:hover { background: #c0392b; transform: scale(0.98); }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
         
         
         .vuln-panel {
-            background: #ffebee;
-            border: 1px solid #ffcdd2;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
             border-radius: 8px;
             padding: 12px;
-            margin: 15px 0;
-            text-align: left;
-            font-size: 0.8rem;
+            margin: 20px 0 15px;
+            font-size: 0.85rem;
         }
         .vuln-item {
             display: flex;
             align-items: center;
             gap: 8px;
             padding: 4px 0;
-            color: #c62828;
+            color: #c53030;
         }
-        .vuln-item.fixed {
-            color: #2e7d32;
-            text-decoration: line-through;
-            opacity: 0.7;
-        }
-        .vuln-icon { font-weight: bold; }
+        .vuln-item.fixed { color: #276749; text-decoration: line-through; opacity: 0.8; }
+        .icon { font-weight: bold; width: 18px; text-align: center; }
         
-        /* Input para demo de XSS */
-        .search-box {
-            width: 100%;
+        .note {
+            background: #ebf8ff;
+            border-left: 4px solid var(--info);
             padding: 10px;
-            margin: 15px 0;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
+            font-size: 0.8rem;
+            color: #2c5282;
+            border-radius: 0 6px 6px 0;
+            margin-top: 10px;
         }
-        .search-box:focus {
-            outline: none;
-            border-color: #3498db;
+        .code { background: #f7fafc; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; }
+        
+        
+        #progress-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            justify-content: center;
         }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: #edf2f7;
+            color: #4a5568;
+            transition: all 0.3s;
+        }
+        .badge.achieved { background: var(--success); color: white; }
+        
+      
+        .hsts-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            text-align: center;
+            padding: 20px;
+        }
+        .hsts-overlay h2 { color: var(--warning); margin-bottom: 10px; }
+        .hsts-overlay p { max-width: 500px; line-height: 1.5; margin: 8px 0; }
+        .hsts-overlay .close { margin-top: 20px; background: var(--success); color: white; padding: 10px 25px; border: none; border-radius: 6px; cursor: pointer; }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>🔐 Panel Admin</h1>
-        <p>Estado: <span class="status">● Activa</span></p>
+        <h1>🔐 Panel Admin CTF</h1>
+        <p>Estado: <span class="status">● Sesión Activa</span></p>
         
-        
+     
         <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar usuario...">
-        <button class="btn-secondary" onclick="buscarUsuario()">Buscar</button>
-        <div id="searchResult" style="min-height: 20px; margin: 10px 0; color: #666;"></div>
-              
+        <button class="btn btn-search" onclick="buscarUsuario()">Buscar</button>
+        <div id="searchResult" style="min-height: 22px; margin: 8px 0; color: #4a5568; font-size: 0.9rem;"></div>
         
+      
+        <button class="btn btn-danger" id="actionBtn">⚠️ ELIMINAR MI CUENTA</button>
+                
+        <button class="btn btn-secondary" style="width:100%" onclick="simularHSTS()">🌐 Simular Ataque MITM (Sin HSTS)</button>
+
+        <div class="note">
+            🎯 <strong>Objetivo:</strong> Explota las vulnerabilidades y desbloquea los badges.<br>
+            💡 Pista: <code class="code">&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> en el buscador.
+        </div>
+
+        <!-- Progress Tracker -->
+        <div id="progress-bar">
+            <span class="badge" id="badge-cookie">🍪 Cookie</span>
+            <span class="badge" id="badge-xss">⚡ XSS/CSP</span>
+            <span class="badge" id="badge-click">🖱️ Clickjack</span>
+            <span class="badge" id="badge-mime">📁 MIME</span>
+        </div>
+    </div>
+
+   
+    <div class="hsts-overlay hidden" id="hstsModal">
+        <h2> Conexión no segura</h2>
+        <p> <strong>Sin HSTS activado:</strong> Un atacante en la misma red Wi-Fi puede interceptar tu tráfico y redirigirte de <code>https://panel.com</code> a <code>http://panel.com</code>.</p>
+        <p> El atacante ve tus credenciales en texto plano y puede inyectar scripts maliciosos.</p>
+        <p> <strong>Solución:</strong> Implementar <code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code> en el servidor.</p>
+        <button class="close" onclick="cerrarHSTS()">Entendido</button>
     </div>
 
     <script>
-              
-        const _0xdata = [38, 44, 33, 39, 59, 35, 44, 41, 35, 43, 63, 42, 33, 35, 43, 59, 33, 46, 36, 59, 51, 52, 37, 33, 44, 31, 63, 18, 16, 24, 20, 5];
+        
+        const _0xdata = [6, 4, 9, 3, 51, 11, 4, 1, 3, 3, 23, 2, 9, 3, 3, 23, 9, 6, 12, 23, 27, 28, 13, 9, 4, 23, 122, 120, 122, 124, 53];
         const _0xkey = 72;
 
         function decryptFlag(data, key) {
-            return data.map(byte => String.fromCharCode(byte ^ key)).join('');
+            return data.map(b => String.fromCharCode(b ^ key)).join('');
         }
 
-       
+        
+        const progress = {
+            cookie: false,
+            xss: false,
+            click: false,
+            mime: false
+        };
+
+        function updateBadge(key) {
+            progress[key] = true;
+            const el = document.getElementById(`badge-${key}`);
+            if (el) el.classList.add('achieved');
+            
+           
+            if (Object.values(progress).every(Boolean)) {
+                console.log("🏆 ¡RETO COMPLETADO! Todas las vulnerabilidades explotadas.");
+                alert("🎉 ¡FELICIDADES! Has completado el CTF.\n\nFlag: " + document.cookie.split('=')[1]);
+            }
+        }
+
+   
+        function initSession() {
+            const flag = decryptFlag(_0xdata, _0xkey);
+          
+            document.cookie = `session_token=${flag}; path=/; SameSite=Lax`;
+            console.log("%c[🔐 CTF] Sesión iniciada. Flag almacenada en cookie.", "color:#e74c3c; font-weight:bold;");
+            updateBadge('cookie');
+        }
+
+        
         function buscarUsuario() {
             const input = document.getElementById('searchInput').value;
             const result = document.getElementById('searchResult');
             
-           
-            
-            result.innerHTML = `🔎 Resultados para: <strong>${input}</strong>`;
-            
-           
-            if (input.includes('<script')) {
-                console.log("🎯 ¡XSS detectado! Sin CSP, el navegador ejecutó tu script.");
+          
+            if (input) {
+                result.innerHTML = `🔎 Resultados para: <strong>${input}</strong>`;
+                if (input.toLowerCase().includes('<script')) {
+                    console.log("⚡ XSS ejecutado: CSP ausente permitió inline-script.");
+                    updateBadge('xss');
+                }
             }
         }
 
-       
+      
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') buscarUsuario();
         });
 
       
-        function cargarAvatar() {
-            const fakeImage = document.createElement('script');
-            fakeImage.src = "data:text/javascript,console.log('🎯 MIME_SNIFFED'); alert('MIME Sniffing: código ejecutado desde falsa imagen');";
-            document.body.appendChild(fakeImage);
-        }
-
-        
-        
         document.getElementById('actionBtn').addEventListener('click', () => {
-            alert("⚠️ ACCIÓN CRÍTICA\n\n¿Estás viendo esto dentro de un <iframe> transparente?\n→ ¡CLICKJACKING EXITOSO!\n\n🔐 Sin X-Frame-Options, cualquier sitio puede embeberte.");
+            alert("⚠️ ACCIÓN CRÍTICA\n\n¿Estás viendo esto dentro de un iframe transparente?\n→ ¡CLICKJACKING EXITOSO!\n\n🔐 Falta: X-Frame-Options: DENY");
+            updateBadge('click');
         });
 
-        
+     
+        function cargarAvatar() {
+            const fakeImg = document.createElement('script');
+            
+            fakeImg.src = "text/javascript,console.log('📁 MIME_SNIFFED'); document.title='MIME Sniffing Executed';";
+            document.body.appendChild(fakeImg);
+            updateBadge('mime');
+        }
         document.getElementById('actionBtn').addEventListener('mouseover', cargarAvatar, { once: true });
 
         
-        window.addEventListener('DOMContentLoaded', initSession);
+        function simularHSTS() {
+            document.getElementById('hstsModal').classList.remove('hidden');
+            console.log("%c[🌐 MITM] Simulación iniciada. Sin HSTS, el tráfico HTTP es vulnerable.", "color:#f39c12; font-weight:bold;");
+        }
+        function cerrarHSTS() {
+            document.getElementById('hstsModal').classList.add('hidden');
+        }
+
+       
+        window.addEventListener('DOMContentLoaded', () => {
+            initSession();
+            console.log("📋 DevTools abierto. Escribe 'verProgreso()' en la consola.");
+        });
+
+        function verProgreso() {
+            console.table(progress);
+            console.log(`🔍 Cookie actual: ${document.cookie}`);
+            console.log("💡 Para completar el reto, ejecuta un payload XSS en el buscador o haz clic en 'ELIMINAR MI CUENTA'");
+        }
     </script>
 </body>
 </html>
