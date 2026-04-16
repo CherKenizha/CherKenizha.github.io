@@ -62,7 +62,7 @@
             border-left: 4px solid #ffc107;
         }
         
-        /* === NUEVO: Panel de vulnerabilidades === */
+        
         .vuln-panel {
             background: #ffebee;
             border: 1px solid #ffcdd2;
@@ -113,24 +113,11 @@
         <div id="searchResult" style="min-height: 20px; margin: 10px 0; color: #666;"></div>
         
         
-        <button class="btn-danger" id="actionBtn">⚠️ ELIMINAR MI CUENTA</button>
-        
         <div class="overlay-test">ID Nodo: 0x88234-AD</div>
         
        
-        <div class="vuln-panel">
-            <strong>🔓 Cabeceras FALTANTES (Retos):</strong>
-            <div class="vuln-item"><span class="vuln-icon">❌</span> X-Frame-Options → Clickjacking</div>
-            <div class="vuln-item"><span class="vuln-icon">❌</span> X-Content-Type-Options → MIME Sniffing</div>
-            <div class="vuln-item"><span class="vuln-icon">❌</span> <strong>Content-Security-Policy → XSS</strong> ⭐ NUEVO</div>
-            <div class="vuln-item"><span class="vuln-icon">❌</span> Cookie sin HttpOnly → Robo de sesión</div>
-            <div class="vuln-item"><span class="vuln-icon">❌</span> Cache-Control → Datos en caché público</div>
-        </div>
         
-        <div class="security-note">
-            🎯 <strong>Reto CTF:</strong> Inyecta <code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> en el buscador.<br>
-            💡 Si ejecuta código → ¡Encontraste la vulnerabilidad CSP!
-        </div>
+        
     </div>
 
     <script>
