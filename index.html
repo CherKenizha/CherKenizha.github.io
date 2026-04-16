@@ -111,19 +111,12 @@
         <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar usuario...">
         <button class="btn-secondary" onclick="buscarUsuario()">Buscar</button>
         <div id="searchResult" style="min-height: 20px; margin: 10px 0; color: #666;"></div>
-        
-        
-        <div class="overlay-test">ID Nodo: 0x88234-AD</div>
-        
-       
-        
+              
         
     </div>
 
     <script>
-      
-
-        
+              
         const _0xdata = [38, 44, 33, 39, 59, 35, 44, 41, 35, 43, 63, 42, 33, 35, 43, 59, 33, 46, 36, 59, 51, 52, 37, 33, 44, 31, 63, 18, 16, 24, 20, 5];
         const _0xkey = 72;
 
@@ -159,18 +152,6 @@
         }
 
         
-        function initSession() {
-            const flag = decryptFlag(_0xdata, _0xkey);
-            
-            
-            document.cookie = `session_token=${flag}; path=/; SameSite=Lax`;
-            
-            console.log("%c [🔐 CTF] Sistema cargado. 5 vulnerabilidades activas.", "color: #e74c3c; font-weight: bold;");
-            console.log(`[💡 PISTA 1] Bandera en cookie: ${flag}`);
-            console.log(`[💡 PISTA 2] Prueba XSS: <script>alert(1)</script> en el buscador`);
-            console.log(`[💡 PISTA 3] Sin CSP, cualquier inline-script se ejecuta 🎯`);
-        }
-
         
         document.getElementById('actionBtn').addEventListener('click', () => {
             alert("⚠️ ACCIÓN CRÍTICA\n\n¿Estás viendo esto dentro de un <iframe> transparente?\n→ ¡CLICKJACKING EXITOSO!\n\n🔐 Sin X-Frame-Options, cualquier sitio puede embeberte.");
