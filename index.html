@@ -1,48 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
 <meta charset="UTF-8">
-
-<title>Laboratorio de Cabeceras HTTP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Headers Lab</title>
 
 <style>
 
 body{
-    font-family:Arial;
-    background:#111827;
+    margin:0;
+    background:#0f172a;
+    font-family:Arial, Helvetica, sans-serif;
     color:white;
-    padding:40px;
 }
 
-h1{
-    color:#3b82f6;
+header{
+    background:#1e293b;
+    padding:20px;
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.container{
+    display:flex;
+    gap:20px;
+    padding:20px;
+}
+
+.left{
+    width:40%;
+}
+
+.right{
+    width:60%;
 }
 
 .card{
-    background:#1f2937;
-    padding:20px;
-    margin:20px 0;
+    background:#1e293b;
     border-radius:10px;
+    padding:20px;
+    margin-bottom:20px;
 }
 
 button{
-    padding:12px;
-    cursor:pointer;
-}
 
-iframe{
-
-width:100%;
-height:250px;
-border:2px solid red;
+padding:12px 20px;
+margin:5px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
 
 }
 
-input{
+.red{
 
-padding:10px;
-width:300px;
+background:#dc2626;
+color:white;
+
+}
+
+.green{
+
+background:#16a34a;
+color:white;
+
+}
+
+pre{
+
+background:#020617;
+padding:20px;
+border-radius:8px;
+overflow:auto;
+font-size:14px;
+line-height:22px;
+
+}
+
+.headerLine{
+
+cursor:pointer;
+padding:3px;
+
+}
+
+.headerLine:hover{
+
+background:#1d4ed8;
+
+}
+
+#info{
+
+background:#111827;
+padding:20px;
+border-radius:10px;
+min-height:150px;
+
+}
+
+.menu{
+
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:20px;
+
+}
+
+.option{
+
+background:#334155;
+padding:15px;
+border-radius:8px;
+text-align:center;
 
 }
 
@@ -52,88 +125,338 @@ width:300px;
 
 <body>
 
-<h1>Laboratorio de Cabeceras HTTP</h1>
+<header>
 
-<p>Demo para presentación de Seguridad Web.</p>
+🔐 Security Headers Demo
+
+</header>
+
+<div class="container">
+
+<div class="left">
 
 <div class="card">
 
-<h2>1. XSS</h2>
+<h2>🏦 SecureBank</h2>
 
-<p>Escribe cualquier texto.</p>
+<p><b>Usuario:</b> Cecilia</p>
 
-<input id="xss">
+<p><b>Saldo:</b> $185,450.00</p>
 
-<button onclick="mostrar()">
+<div class="menu">
 
-Mostrar
+<div class="option">👤 Mi Perfil</div>
+
+<div class="option">💳 Cuentas</div>
+
+<div class="option">💸 Transferencias</div>
+
+<div class="option">📄 Estados de Cuenta</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Modo Demo</h2>
+
+<button class="red" onclick="vulnerable()">
+
+Sitio Vulnerable
 
 </button>
 
-<div id="resultado"></div>
+<button class="green" onclick="seguro()">
 
-</div>
-
-<div class="card">
-
-<h2>2. Clickjacking</h2>
-
-<p>Esta página puede cargarse dentro de un iframe porque GitHub Pages no envía X-Frame-Options.</p>
-
-<iframe src="https://TUUSUARIO.github.io"></iframe>
-
-</div>
-
-<div class="card">
-
-<h2>3. Cookies</h2>
-
-<button onclick="cookies()">
-
-Mostrar Cookies
+Sitio Seguro
 
 </button>
 
-<p id="cookie"></p>
+</div>
+
+<div id="info">
+
+Haz clic sobre cualquier cabecera HTTP para conocer su función.
 
 </div>
 
+</div>
+
+<div class="right">
+
 <div class="card">
 
-<h2>4. Cache-Control</h2>
+<h2>📡 HTTP Response</h2>
 
-<p>
+<pre id="headers">
 
-Abre DevTools →
+HTTP/2 200 OK
 
-Network →
+Server: SecureBank
 
-Selecciona esta página →
+Content-Type: text/html
 
-Observa los Headers.
+<span class="headerLine" onclick="explicar('csp')">Content-Security-Policy</span>
 
-</p>
+<span class="headerLine" onclick="explicar('hsts')">Strict-Transport-Security</span>
+
+<span class="headerLine" onclick="explicar('xfo')">X-Frame-Options</span>
+
+<span class="headerLine" onclick="explicar('nosniff')">X-Content-Type-Options</span>
+
+<span class="headerLine" onclick="explicar('referrer')">Referrer-Policy</span>
+
+<span class="headerLine" onclick="explicar('permissions')">Permissions-Policy</span>
+
+<span class="headerLine" onclick="explicar('coop')">Cross-Origin-Opener-Policy</span>
+
+<span class="headerLine" onclick="explicar('coep')">Cross-Origin-Embedder-Policy</span>
+
+<span class="headerLine" onclick="explicar('cache')">Cache-Control</span>
+
+<span class="headerLine" onclick="explicar('cookie')">Set-Cookie</span>
+
+</pre>
+
+</div>
+
+</div>
 
 </div>
 
 <script>
+const headers = document.getElementById("headers");
+const info = document.getElementById("info");
 
-function mostrar(){
+function vulnerable(){
 
-let dato=document.getElementById("xss").value;
+headers.innerHTML = `HTTP/2 200 OK
 
-document.getElementById("resultado").innerHTML=dato;
+Server: SecureBank
+
+Content-Type: text/html
+
+Cache-Control: public
+
+Set-Cookie: SESSIONID=ABC123`;
+
+info.innerHTML = `
+<h2 style="color:#ef4444;">🔴 Sitio Vulnerable</h2>
+
+<ul>
+<li>❌ No existe Content-Security-Policy</li>
+<li>❌ No existe HSTS</li>
+<li>❌ No existe X-Frame-Options</li>
+<li>❌ No existe X-Content-Type-Options</li>
+<li>❌ No existe Referrer-Policy</li>
+<li>❌ No existe Permissions-Policy</li>
+<li>❌ No existe COOP</li>
+<li>❌ No existe COEP</li>
+<li>⚠ Cache-Control permite almacenar información.</li>
+<li>⚠ Cookie sin Secure, HttpOnly ni SameSite.</li>
+</ul>`;
+}
+
+function seguro(){
+
+headers.innerHTML = `HTTP/2 200 OK
+
+Server: SecureBank
+
+Content-Type: text/html
+
+Content-Security-Policy: default-src 'self';
+
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+X-Frame-Options: DENY
+
+X-Content-Type-Options: nosniff
+
+Referrer-Policy: strict-origin-when-cross-origin
+
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+Cross-Origin-Opener-Policy: same-origin
+
+Cross-Origin-Embedder-Policy: require-corp
+
+Cache-Control: no-store
+
+Set-Cookie: SESSIONID=ABC123;
+Secure;
+HttpOnly;
+SameSite=Strict`;
+    
+info.innerHTML=`
+<h2 style="color:#22c55e;">🟢 Sitio Seguro</h2>
+
+<p>Este sitio implementa las principales cabeceras de seguridad recomendadas.</p>
+
+<p>Puedes comparar la diferencia con el modo vulnerable.</p>`;
+}
+
+function explicar(tipo){
+
+switch(tipo){
+
+case "csp":
+
+info.innerHTML=`
+<h2>🛡 Content-Security-Policy</h2>
+
+<p><b>¿Qué hace?</b></p>
+
+<p>Controla desde dónde puede cargarse JavaScript, CSS, imágenes y otros recursos.</p>
+
+<p><b>Previene</b></p>
+
+<ul>
+
+<li>XSS</li>
+
+<li>Inyección de código</li>
+
+</ul>`;
+
+break;
+
+case "hsts":
+
+info.innerHTML=`
+<h2>🔒 Strict-Transport-Security</h2>
+
+<p>Obliga al navegador a utilizar HTTPS.</p>
+
+<p><b>Previene</b></p>
+
+<ul>
+
+<li>SSL Stripping</li>
+
+<li>MITM</li>
+
+</ul>`;
+
+break;
+
+case "xfo":
+
+info.innerHTML=`
+<h2>🖼 X-Frame-Options</h2>
+
+<p>Impide que la aplicación sea cargada dentro de un iframe.</p>
+
+<p><b>Previene</b></p>
+
+<ul>
+
+<li>Clickjacking</li>
+
+</ul>`;
+
+break;
+
+case "nosniff":
+
+info.innerHTML=`
+<h2>📄 X-Content-Type-Options</h2>
+
+<p>Evita el MIME Sniffing.</p>
+
+<p>El navegador respeta el Content-Type enviado por el servidor.</p>`;
+
+break;
+
+case "referrer":
+
+info.innerHTML=`
+<h2>🔗 Referrer-Policy</h2>
+
+<p>Controla qué información de la URL se comparte con otros sitios.</p>
+
+<p>Reduce fugas de tokens y parámetros sensibles.</p>`;
+
+break;
+
+case "permissions":
+
+info.innerHTML=`
+<h2>🎥 Permissions-Policy</h2>
+
+<p>Restringe el acceso a cámara, micrófono y geolocalización.</p>`;
+
+break;
+
+case "coop":
+
+info.innerHTML=`
+<h2>🌐 COOP</h2>
+
+<p>Aísla la ventana del navegador para reducir ataques entre diferentes orígenes.</p>`;
+
+break;
+
+case "coep":
+
+info.innerHTML=`
+<h2>🛡 COEP</h2>
+
+<p>Permite cargar únicamente recursos que autorizan el uso cross-origin.</p>`;
+
+break;
+
+case "cache":
+
+info.innerHTML=`
+<h2>📦 Cache-Control</h2>
+
+<p>Define cómo puede almacenarse una respuesta HTTP.</p>
+
+<p><b>Recomendado para información sensible:</b></p>
+
+<pre>Cache-Control: no-store</pre>
+
+<p><b>Evita:</b></p>
+
+<ul>
+
+<li>Web Cache Deception</li>
+
+<li>Exposición de información privada</li>
+
+</ul>`;
+
+break;
+
+case "cookie":
+
+info.innerHTML=`
+<h2>🍪 Set-Cookie</h2>
+
+<pre>
+
+SESSIONID=ABC123
+
+Secure
+
+HttpOnly
+
+SameSite=Strict
+
+</pre>
+
+<p><b>Secure</b> → Solo HTTPS.</p>
+
+<p><b>HttpOnly</b> → JavaScript no puede leer la cookie.</p>
+
+<p><b>SameSite</b> → Reduce ataques CSRF.</p>`;
+
+break;
 
 }
 
-function cookies(){
-
-document.getElementById("cookie").innerHTML=document.cookie;
-
 }
 
-</script>
-
-</body>
-
-</html>
+seguro();
